@@ -1,0 +1,145 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Simple Percentage Bar</title>
+  <style>
+
+
+:root{
+   --bar-color:rgb(82, 189, 50); /*RGBA Value of the bar color*/
+   --bar-background-color:rgba(220,220,220,1); /*RGBA Value of the background color of the bar*/
+   --bar-width:200px; /*width of the bar*/
+   --bar-height:30px; /*heigth of the bar*/
+
+   --bar-mask:polygon(0 0, 0 100%, 50% 100%, 50% 0);
+}
+body{
+  color:white;
+}
+.barContainer{
+    height: var(--bar-height);
+    width: var(--bar-width);
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.bar{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top:0;
+    left:0;
+}
+.filled{
+    background-color: var(--bar-color);
+    clip-path: var(--bar-mask);
+}
+.empty{
+    background-color: var(--bar-background-color);
+}
+
+    </style>
+    <script>
+
+      var zeroValue=0;
+      var fullValue=100;
+      var mask = "";
+      var percentage = "";
+      var barValue = zeroValue;
+      var max = fullValue-zeroValue;
+      render();
+
+      function plus(value){
+          if(barValue+value>fullValue){
+              barValue=fullValue;
+          }
+          else{
+              barValue+=value;
+          }
+          barValue=parseInt(barValue);
+          render();
+      }
+      function minus(value){
+        if(barValue-value<zeroValue){
+              barValue=zeroValue;
+          }
+          else{
+              barValue-=value;
+          }
+          barValue=parseInt(barValue);
+          render();
+      }
+      function render(){
+          calcPercentage();
+        mask="polygon(0 0, 0 100%, "+percentage+" 100%, "+percentage+" 0)";
+        document.documentElement.style.setProperty("--bar-mask", mask);
+        console.log(mask);
+        updateDisplayBarValue();
+      }
+      function calcPercentage(){
+          percentage=barValue - zeroValue;
+          percentage/=max;
+          percentage*=100;
+          percentage=percentage.toString().substring(0,4)+'%';
+      }
+      function setZeroValue(){
+          let value = document.getElementById("setFrom").value;
+          if(parseInt(value)!=NaN){
+            zeroValue=value;
+            calculateMax();
+          }
+          updateSettingsDisplay();
+      }
+      function setFullValue(){
+          let value = document.getElementById("setTo").value;
+          if(parseInt(value)!=NaN){
+            fullValue=value;
+            calculateMax();
+          }
+          updateSettingsDisplay();
+      }
+      function updateSettingsDisplay(){
+        document.getElementById("from").innerHTML=zeroValue;
+        document.getElementById("to").innerHTML=fullValue;
+      }
+      function calculateMax(){
+        max = fullValue-zeroValue;
+      }
+      function setBarValue(){
+        let value = parseInt(document.getElementById("setBarValue").value);
+          if(value!=NaN){
+            barValue=value;
+          }
+          render();
+      }
+      function updateDisplayBarValue(){
+        document.getElementById("setBarValue").value = barValue;
+      }
+    
+</script>
+</head>
+
+<body>
+    <div class="barContainer">
+        <div class="bar empty"></div>
+        <div class="bar filled"></div>
+    </div>
+    <div class="settingDisplay">
+        Current Settings:<br>
+        <span id="from"></span>
+        <span> - </span>
+        <span id="to"></span>
+    </div>
+    <div class="settings">
+        <button onclick="plus(1)">+</button>
+        <button onclick="minus(1)">-</button>
+        <br>
+        <div><span>value: </span><input type="text" id="setBarValue"><button onclick="setBarValue()">set</button></div>
+        <div><span>from: </span><input type="text" id="setFrom"><button onclick="setZeroValue()">set</button></div>
+        <div><span>to: </span><input type="text" id="setTo"><button onclick="setFullValue()">set</button></div>
+    </div>
+</body>
+</html>
